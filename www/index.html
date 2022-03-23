@@ -37,67 +37,102 @@
         </div>
     </nav>
 
-
-    <div class="d-sm-flex align-items-center justify-content-between mt-4 mb-4">
+    <div class="container-fluid">
+        <div class="d-sm-flex align-items-center justify-content-between mt-4 mb-4">
+            <div class="container">
+                <a href="tambah.html" class="btn btn-sm btn-primary shadow-sm"><i
+                        class="fas mr-2 fa-plus fa-sm text-white-50"></i>
+                    tambah data</a>
+            </div>
+        </div>
         <div class="container">
-            <a href="tambah.html" class="btn btn-sm btn-primary shadow-sm"><i
-                    class="fas mr-2 fa-plus fa-sm text-white-50"></i>
-                tambah data</a>
+            <div class="alert alert-success mt-5" role="alert" id="pesan">
+            </div>
         </div>
-    </div>
-
-
-    <div class="card shadow mb-4">
-        <div class="card-header py-3">
-            <h6 class="m-0 font-weight-bold text-primary">Dataset Example</h6>
-        </div>
-        <div class="card-body">
-            <div class="table-responsive">
-                <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
-                    <thead>
-                        <tr>
-                            <th>nama</th>
-                            <th>kelas</th>
-                            <th>NIS</th>
-                            <th>alamat</th>
-                            <th>Aksi</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr class="tr">
-                            <td class="nama"></td>
-                            <td class="kelas"></td>
-                            <td class="NIS"></td>
-                            <td class="alamat"></td>
-                            <td class="d-flex">
-                                <a href="edit.html" class="btn btn-primary mr-2">edit</a>
-                                <a href="#" class="btn btn-danger">delete</a>
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
+        <div class="card shadow mb-4">
+            <div class="card-header py-3">
+                <h6 class="m-0 font-weight-bold text-primary" id="title"></h6>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
+                        <thead>
+                            <tr>
+                                <th>nama</th>
+                                <th>kelas</th>
+                                <th>NIS</th>
+                                <th>alamat</th>
+                                <th>Aksi</th>
+                            </tr>
+                        </thead>
+                        <tbody id="dataBaru">
+                        </tbody>
+                    </table>
+                </div>
             </div>
         </div>
     </div>
 
-    </div>
-    <!-- /.container-fluid -->
-
-    </div>
-    <!-- End of Main Content -->
-
-
-
     <!-- Bootstrap core JavaScript-->
     <script src="assets/vendor/jquery/jquery.min.js"></script>
     <script src="assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
-
     <!-- Core plugin JavaScript-->
     <script src="assets/vendor/jquery-easing/jquery.easing.min.js"></script>
-
     <!-- Custom scripts for all pages-->
     <script src="assets/js/sb-admin-2.min.js"></script>
     <script src="assets/js/main.js"></script>
+    <script>
+        const pesan = document.getElementById("pesan");
+        pesan.style.display = "none";
+        $(document).ready(function () {
+            const xhr = new XMLHttpRequest();
+            const url = "http://127.0.0.1:8000/api/data_siswa";
+            // jika tidak dapat mengambil datanya
+            xhr.onerror = function () {
+                alert("gagal mengambil data");
+            }
+            xhr.onreadystatechange = function () {
+                if (this.readyState == 4 && this.status == 200) {
+                    const data = JSON.parse(this.responseText);
+                    document.getElementById("title").innerHTML = data.message;
+                    $.each(data.data, function (key, val) {
+                        const baris_baru = $("<tr>");
+                        baris_baru.html("<td>" + val.nama + "</td><td>" + val.NIS +
+                            "</td><td>" + val.kelas + "</td><td>" + val.alamat +
+                            "</td><td class='d-flex'><a href='edit.html' id='btn_edit' data-id='" +
+                            val.id_siswa +
+                            "' class='btn btn-primary mr-2'>edit</a><button data-id1='" + val
+                            .id_siswa +
+                            "' id='btn_delete' class='btn btn-dark'>delete</button></td>"
+                        );
+                        const data_handler = $("#dataBaru");
+                        data_handler.append(baris_baru)
+                    });
+                }
+            };
+
+            xhr.open("GET", url, true);
+            xhr.send();
+        });
+
+        $(document).on('click', '#btn_delete', function () {
+            if (!confirm("kamu yakin mau hapus data ini?")) {
+                return false;
+            }
+            var Delete_ID = $(this).attr('data-id1');
+            $.ajax({
+                url: "http://127.0.0.1:8000/api/data_siswa/" + Delete_ID,
+                type: "DELETE",
+                cache: false,
+                success: function (response) {
+                    pesan.innerHTML = response.message;
+                    pesan.style.display = "block";
+                    $("#dataBaru").DataTable().ajax.reload();
+                }
+            })
+        })
+    </script>
+
 </body>
 
 </html>
