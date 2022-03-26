@@ -1,12 +1,12 @@
-function tampil_data() {
-    const xhr = new XMLHttpRequest();
-    const url = "http://127.0.0.1:8000/api/data_siswa";
-    xhr.onreadystatechange = function () {
-        if (this.readyState == 4 && this.status == 200) {
-            // document.getElementById("data_siswa").innerHTML = this.responseText;
-            console.log(this.responseText);
-        }
-    }
-    xhr.open("GET", url, true);
-    xhr.send();
-}
+$(document).on("click", "#btn_edit", function () {
+    const id_siswa = $(this).attr("data-id");
+    sessionStorage.setItem("id_siswa", id_siswa);
+    // $.ajax({
+    //     url: "http://127.0.0.1:8000/api/data_siswa/" + id_siswa,
+    //     type: "GET",
+    //     cache: false,
+    //     success: function (result) {
+    //         console.log(result.data.nama);
+    //     }
+    // });
+});

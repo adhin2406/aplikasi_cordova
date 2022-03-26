@@ -37,6 +37,8 @@
         </div>
     </nav>
 
+    <div class="alert alert-success mt-5" role="alert" id="pesan">
+    </div>
 
     <div class="d-sm-flex align-items-center justify-content-between mt-4 mb-4">
         <div class="container">
@@ -47,7 +49,7 @@
     </div>
 
     <div class="container">
-        <form>
+        <form method="post" onsubmit="return sendData()" autocomplete="off">
             <div class="form-group">
                 <label for="nama">Nama Lengkap</label>
                 <input type="text" class="form-control" id="nama" name="nama" placeholder="masukan nama lengkap">
@@ -58,11 +60,11 @@
             </div>
             <div class="form-group">
                 <label for="nis">NIS</label>
-                <input type="email" class="form-control" id="nis" name="NIS" placeholder="masukan NIS">
+                <input type="text" class="form-control" id="nis" name="NIS" placeholder="masukan NIS">
             </div>
             <div class="form-group">
                 <label for="alamat">Alamat</label>
-                <input type="password" class="form-control" id="alamat" placeholder="masukan alamat" name="alamat">
+                <input type="text" class="form-control" id="alamat" placeholder="masukan alamat" name="alamat">
             </div>
             <button type="submit" class="btn btn-primary form-control">Submit</button>
         </form>
@@ -78,7 +80,47 @@
     <script src="assets/vendor/jquery-easing/jquery.easing.min.js"></script>
 
     <!-- Custom scripts for all pages-->
-    <script src="js/sb-admin-2.min.js"></script>
+    <script src="assets/js/sb-admin-2.min.js"></script>
+    <script>
+        const pesan = document.getElementById("pesan");
+        pesan.style.display = "none";
+        const id_siswa = sessionStorage.getItem("id_siswa");
+        $.ajax({
+            url: "http://127.0.0.1:8000/api/data_siswa/" + id_siswa,
+            type: "GET",
+            cache: false,
+            success: function (result) {
+                const data = result.data
+                $("#nama").val(data.nama);
+                $("#kelas").val(data.kelas);
+                $("#nis").val(data.kelas);
+                $("#alamat").val(data.kelas);
+            }
+        });
+
+        function sendData() {
+            var xhr = new XMLHttpRequest();
+            var url = "http://127.0.0.1:8000/api/data_siswa/" + id_siswa;
+
+            var data = JSON.stringify({
+                nama: document.getElementById("nama").value,
+                kelas: document.getElementById("kelas").value,
+                NIS: document.getElementById("nis").value,
+                alamat: document.getElementById("alamat").value
+            });
+
+            xhr.open("PUT", url, true);
+            xhr.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
+            xhr.onload = function () {
+                const data = JSON.parse(this.responseText);
+                pesan.innerHTML = data.message;
+                pesan.style.display = "block";
+            };
+
+            xhr.send(data);
+            return false;
+        }
+    </script>
 </body>
 
 </html>
